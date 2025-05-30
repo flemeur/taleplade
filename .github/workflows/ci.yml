@@ -36,13 +36,10 @@ jobs:
           check-latest: true
 
       - name: Run linters
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: latest
-          skip-pkg-cache: true
-          skip-build-cache: true
           install-mode: binary
-          args: --timeout 5m # --verbose
+          version: latest
 
       - name: Build
         run: make
