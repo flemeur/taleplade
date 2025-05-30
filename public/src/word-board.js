@@ -55,17 +55,15 @@ function renderNavigation(pages) {
 }
 
 function tts(text) {
-	console.log('TTS', text);
-
 	const params = new URLSearchParams();
 	params.set('q', text);
 
-	const audio = new Audio(`./tts?${params.toString()}`);
+	const audio = new Audio(`/api/tts?${params.toString()}`);
 	audio.addEventListener('canplaythrough', () => audio.play(), { once: true });
 }
 
 function buttonSound() {
-	const audio = new Audio('assets/button1.mp3');
+	const audio = new Audio('/assets/button1.mp3');
 	audio.addEventListener('canplaythrough', () => audio.play(), { once: true });
 }
 

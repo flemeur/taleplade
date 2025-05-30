@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"os"
 	"os/signal"
 	"path"
@@ -18,6 +16,7 @@ import (
 
 	"github.com/flemeur/taleplade"
 	"github.com/flemeur/taleplade/api"
+	"github.com/flemeur/taleplade/memcache"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/lpar/gzipped/v2"
@@ -39,7 +38,12 @@ func run() error {
 		return fmt.Errorf("json.NewDecoder: %w", err)
 	}
 
-	apiServer := api.NewServer(&config)
+	cache := memcache.New("memcached:11211")
+	if err := cache.Ping(); err != nil {
+		return fmt.Errorf("memcache.Ping: %w", err)
+	}
+
+	apiServer := api.NewServer(&config, cache)
 
 	router := chi.NewRouter()
 	router.Use(middleware.RequestID)
@@ -63,8 +67,6 @@ func run() error {
 	))
 
 	router.Mount("/api", apiServer)
-
-	router.Mount("/tts", ttsProxy())
 
 	wwwDir := filepath.Join(execDir, "public")
 	router.Mount("/", frontendHandler(wwwDir))
@@ -94,62 +96,6 @@ func run() error {
 	}
 
 	return nil
-}
-
-func ttsProxy() http.Handler {
-	// "Free" TTS solution with good support for danish
-	// https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=test+af+tekst+til+tale&tl=da
-
-	target, err := url.Parse("https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=da")
-	if err != nil {
-		panic(err)
-	}
-
-	return &httputil.ReverseProxy{
-		Director: func(req *http.Request) {
-			targetQuery := target.RawQuery
-			req.URL.Scheme = target.Scheme
-			req.URL.Host = target.Host
-			req.URL.Path = target.EscapedPath()
-			if targetQuery == "" || req.URL.RawQuery == "" {
-				req.URL.RawQuery = targetQuery + req.URL.RawQuery
-			} else {
-				req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
-			}
-			req.Header.Del("Cookie")
-			req.Header.Del("Referer")
-			req.Host = "" // Set r.Host empty to use r.URL.Host instead
-		},
-		ModifyResponse: func(resp *http.Response) error {
-			// Content-Type: audio/mpeg
-			// Transfer-Encoding: chunked
-
-			resp.Header.Del("Accept-Ch")
-			resp.Header.Del("Alt-Svc")
-			resp.Header.Del("Content-Security-Policy")
-			resp.Header.Del("Content-Security-Policy")
-			resp.Header.Del("Cross-Origin-Opener-Policy")
-			resp.Header.Del("Cross-Origin-Resource-Policy")
-			resp.Header.Del("P3p")
-			resp.Header.Del("Permissions-Policy")
-			resp.Header.Del("Reporting-Endpoints")
-			resp.Header.Del("Server")
-			resp.Header.Del("X-Content-Type-Options")
-			resp.Header.Del("X-Frame-Options")
-			resp.Header.Del("X-Xss-Protection")
-			resp.Header.Del("Set-Cookie")
-			resp.Header.Del("Pragma")
-
-			cacheDuration := 14 * 24 * time.Hour
-			now := time.Now()
-
-			resp.Header.Set("Cache-Control", fmt.Sprintf("public, max-age=%d", cacheDuration/time.Second))
-			resp.Header.Set("Expires", now.Add(cacheDuration).Format(http.TimeFormat))
-			resp.Header.Set("Last-Modified", now.UTC().Format(http.TimeFormat))
-
-			return nil
-		},
-	}
 }
 
 func frontendHandler(dir string) http.Handler {

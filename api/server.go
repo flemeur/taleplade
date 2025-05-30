@@ -10,9 +10,10 @@ import (
 
 	"github.com/flemeur/taleplade"
 	"github.com/flemeur/taleplade/errors"
+	"github.com/flemeur/taleplade/memcache"
 )
 
-func NewServer(config *taleplade.Config) http.Handler {
+func NewServer(config *taleplade.Config, cache *memcache.Cache) http.Handler {
 	r := chi.NewRouter()
 
 	r.MethodNotAllowed(HandlerFunc(func(w http.ResponseWriter, r *http.Request) error {
@@ -27,6 +28,7 @@ func NewServer(config *taleplade.Config) http.Handler {
 
 	s := &server{
 		config: config,
+		cache:  cache,
 		router: r,
 	}
 
@@ -37,6 +39,7 @@ func NewServer(config *taleplade.Config) http.Handler {
 
 type server struct {
 	config *taleplade.Config
+	cache  *memcache.Cache
 	router chi.Router
 }
 
