@@ -15,7 +15,9 @@ func (s *server) handleTTS(w http.ResponseWriter, r *http.Request) error {
 	cached, err := s.cache.Get(cacheKey(r.URL))
 	if err == nil && len(cached) > 0 {
 		w.Header().Set("Content-Type", "audio/mpeg")
-		w.Write(cached)
+		if _, err := w.Write(cached); err != nil {
+			return fmt.Errorf("w.Write: %w", err)
+		}
 
 		return nil
 	}
@@ -51,7 +53,9 @@ func (s *server) handleTTS(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	w.Header().Set("Content-Type", "audio/mpeg")
-	w.Write(body)
+	if _, err := w.Write(body); err != nil {
+		return fmt.Errorf("w.Write: %w", err)
+	}
 
 	return nil
 }
