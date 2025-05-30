@@ -111,19 +111,19 @@ jobs:
           build-args: |
             VERSION=${{ steps.version.outputs.version }}
 
-  deploy:
-    name: 'Deploy'
-
-    needs: [build, push]
-
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-
-    strategy:
-      matrix:
-        environment: [prod]
-
-    uses: ./.github/workflows/cd.yml
-    with:
-      environment: ${{ matrix.environment }}
-      version: ${{ needs.push.outputs.version }}
-    secrets: inherit
+  # deploy:
+  #   name: 'Deploy'
+  #
+  #   needs: [build, push]
+  #
+  #   if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+  #
+  #   strategy:
+  #     matrix:
+  #       environment: [prod]
+  #
+  #   uses: ./.github/workflows/cd.yml
+  #   with:
+  #     environment: ${{ matrix.environment }}
+  #     version: ${{ needs.push.outputs.version }}
+  #   secrets: inherit
