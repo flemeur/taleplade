@@ -1,0 +1,22 @@
+services:
+  web:
+    build: .
+    depends_on:
+      - memcached
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - ./public:/app/public:ro
+    networks:
+      - frontend
+      - backend
+    ports:
+      - 8080:8080
+
+  memcached:
+    image: memcached:alpine
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:

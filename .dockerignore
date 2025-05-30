@@ -1,0 +1,16 @@
+.git
+.gitignore
+.dockerignore
+.editorconfig
+.prettierignore
+.prettierrc
+eslint.config.js
+packagejson
+package-lock.json
+.vscode
+Dockerfile
+compose.yml
+**/*.md
+taleplade
+Makefile
+node_modules

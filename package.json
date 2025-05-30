@@ -1,0 +1,19 @@
+{
+  "name": "taleplade",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "http-server",
+    "lint": "eslint --max-warnings 0 --ext .js src/",
+    "lint:fix": "npm lint --fix"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "globals": "^16.2.0",
+    "http-server": "^14.1.1",
+    "prettier": "^3.0.0"
+  }
+}

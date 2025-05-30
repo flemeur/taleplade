@@ -1,0 +1,99 @@
+/*
+CSS Rules specific to print media
+
+See: https://developer.mozilla.org/en-US/docs/Web/Guide/Printing
+
+Also check out this blog post about print CSS: https://www.jotform.com/blog/css-perfect-print-stylesheet-98272/
+
+*/
+
+/* Force a page break by using this class between elements: <div class="page-break"></div> */
+.page-break {
+	/* clear: both; */
+	/* display: block; */
+	page-break-before: always;
+	break-before: always;
+}
+
+@page {
+	margin: 0.5cm;
+}
+
+/* Avoid page breaks inside theese elements */
+a {
+	page-break-inside: avoid;
+	break-inside: avoid;
+}
+blockquote {
+	page-break-inside: avoid;
+	break-inside: avoid;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	page-break-after: avoid;
+	break-after: avoid;
+	page-break-inside: avoid;
+	break-inside: avoid;
+}
+img,
+canvas {
+	page-break-inside: avoid;
+	break-inside: avoid;
+	page-break-after: avoid;
+	break-after: avoid;
+}
+table,
+pre {
+	page-break-inside: avoid;
+	break-inside: avoid;
+}
+ul,
+ol,
+dl {
+	page-break-before: avoid;
+	break-before: avoid;
+}
+
+/* Displaying link color and link behaviour */
+a:link,
+a:visited,
+a {
+	background: transparent;
+	color: #00f;
+	font-weight: bold;
+	text-decoration: underline;
+	text-align: left;
+}
+a[href^='http']:after {
+	content: ' < ' attr(href) '> ';
+}
+a:after > img {
+	content: '';
+}
+a[href^='#']:after {
+	content: '';
+}
+a:not(:local-link):after {
+	content: ' < ' attr(href) '> ';
+}
+
+body {
+	/* Set font to 16px/13pt, set background to white and font to black */
+	/* This saves ink */
+	font-size: 13pt;
+	line-height: 1.5;
+	background: #fff !important;
+	color: #000;
+
+	/* Force browsers to print background colors. See: https://caniuse.com/#search=color-adjust */
+	-webkit-print-color-adjust: exact; /* Chrome/Chromium, Safari */
+	color-adjust: exact; /* Firefox */
+}
+
+.no-print {
+	display: none !important;
+}

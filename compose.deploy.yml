@@ -1,0 +1,23 @@
+services:
+  web:
+    image: ghcr.io/flemeur/taleplade:latest
+    restart: always
+    depends_on:
+      - memcached
+    volumes:
+      - ./config.json:/app/config.json:ro
+    networks:
+      - frontend
+      - backend
+    ports:
+      - 8080:8080
+
+  memcached:
+    image: memcached:alpine
+    restart: always
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
