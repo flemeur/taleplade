@@ -93,8 +93,14 @@ function showLoading(show = true) {
 	$loader.classList.add('is-hidden');
 }
 
-async function getPhrases() {
+async function loadResources() {
 	showLoading();
+	return await Promise.all([loadPhrases(), loadNames()]).finally(() => {
+		showLoading(false);
+	});
+}
+
+async function loadPhrases() {
 	return fetch('/api/phrases')
 		.then(resp => {
 			if (!resp.ok) {
@@ -104,14 +110,10 @@ async function getPhrases() {
 		})
 		.catch(err => {
 			console.warn(err);
-		})
-		.finally(() => {
-			showLoading(false);
 		});
 }
 
-async function getNames() {
-	showLoading();
+async function loadNames() {
 	return fetch('/api/names')
 		.then(resp => {
 			if (!resp.ok) {
@@ -121,19 +123,15 @@ async function getNames() {
 		})
 		.catch(err => {
 			console.warn(err);
-		})
-		.finally(() => {
-			showLoading(false);
 		});
 }
 
 export async function main() {
 	$loader = document.getElementById('loader');
-	$pageContainer = document.querySelector('.page-container');
+	$pageContainer = document.getElementById('page-container');
 	$navList = document.getElementById('nav-list');
 
-	const phrases = await getPhrases();
-	const names = await getNames();
+	const [phrases, names] = await loadResources();
 
 	const pages = [
 		{
