@@ -2,6 +2,12 @@ package api
 
 import "net/http"
 
+func (s *server) handleGetResources(w http.ResponseWriter, r *http.Request) error {
+	return Respond(w, http.StatusOK, struct {
+		Todo string `json:"todo"`
+	}{Todo: "yes"})
+}
+
 func (s *server) handleGetPhrases(w http.ResponseWriter, r *http.Request) error {
 	return Respond(w, http.StatusOK, s.config.Phrases)
 }

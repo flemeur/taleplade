@@ -12,6 +12,8 @@ func (s *server) attachRoutes() {
 		}{Message: "Hello"})
 	}))
 
+	s.router.Method(http.MethodGet, "/resources", Handler(s.handleGetResources))
+
 	s.router.Method(http.MethodGet, "/phrases", Handler(s.handleGetPhrases))
 	s.router.Method(http.MethodGet, "/names", Handler(s.handleGetNames))
 
