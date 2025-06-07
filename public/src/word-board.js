@@ -1,57 +1,23 @@
-/** @type {HTMLDivElement} */
-let $loader;
-/** @type {HTMLDivElement} */
-let $pageContainer;
-/** @type {HTMLDivElement} */
-let $navList;
-
 function renderPages(pages) {
-	for (const [i, page] of pages.entries()) {
+	for (const page of pages) {
 		const $grid = document.createElement('div');
 		$grid.className = 'word-board-grid';
-		if (i > 0) {
-			$grid.classList.add('page-break');
-		}
+
 		for (const tile of page.tiles) {
 			const $button = document.createElement('button');
 			$button.innerText = tile.label;
+
 			if (typeof tile.handler === 'function') {
 				$button.addEventListener('click', () => tile.handler());
 			} else {
 				$button.addEventListener('click', () => tts(tile.label));
 			}
+
 			$grid.appendChild($button);
 		}
+
 		$pageContainer.appendChild($grid);
 	}
-}
-
-function changePage(i) {
-	let j = 0;
-	for (const child of $pageContainer.children) {
-		if (i === j) {
-			$navList.children.item(j).ariaCurrent = 'true';
-			child.classList.remove('hidden');
-		} else {
-			$navList.children.item(j).ariaCurrent = 'false';
-			child.classList.add('hidden');
-		}
-		j++;
-	}
-}
-
-function renderNavigation(pages) {
-	const items = [];
-	for (const [i, page] of pages.entries()) {
-		const $button = document.createElement('button');
-		$button.className = 'secondary';
-		$button.innerText = page.label;
-		$button.addEventListener('click', () => {
-			changePage(i);
-		});
-		items.push($button);
-	}
-	$navList.replaceChildren(...items);
 }
 
 function tts(text) {
@@ -126,10 +92,14 @@ async function loadNames() {
 		});
 }
 
+/** @type {HTMLDivElement} */
+let $loader;
+/** @type {HTMLDivElement} */
+let $pageContainer;
+
 export async function main() {
 	$loader = document.getElementById('loader');
 	$pageContainer = document.getElementById('page-container');
-	$navList = document.getElementById('nav-list');
 
 	const [phrases, names] = await loadResources();
 
@@ -184,7 +154,5 @@ export async function main() {
 
 	let wordAccumulator = [];
 
-	renderNavigation(pages);
 	renderPages(pages);
-	changePage(0);
 }
