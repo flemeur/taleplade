@@ -1,4 +1,4 @@
-.PHONY: default build docker static clean frontend
+.PHONY: default build docker static clean
 
 default: build
 
